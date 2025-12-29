@@ -1,0 +1,357 @@
+:root {
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --surface-hover: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --accent: #0d9488;
+    --accent-hover: #0f766e;
+    --accent-light: #5eead4;
+    --success: #059669;
+    --danger: #dc2626;
+    --border: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+}
+
+header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+#status-indicator {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--bg);
+    border-radius: 6px;
+}
+
+#status-indicator.error {
+    color: var(--danger);
+    background: #fef2f2;
+}
+
+#status-indicator.connecting {
+    color: #d97706;
+    background: #fffbeb;
+}
+
+#status-indicator.loading {
+    color: var(--accent);
+}
+
+#status-indicator.success {
+    color: var(--success);
+    background: #ecfdf5;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#new-title {
+    flex: 1;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    font-size: 14px;
+    background: var(--surface);
+    outline: none;
+    color: var(--text-primary);
+    font-weight: 400;
+    border-radius: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#new-title:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+#new-title::placeholder {
+    color: var(--text-secondary);
+}
+
+#create-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+#create-btn:hover {
+    background: var(--accent-hover);
+}
+
+#create-btn:active {
+    transform: scale(0.97);
+}
+
+#create-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+    stroke: var(--text-secondary);
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+li {
+    background: var(--surface);
+    margin-bottom: 8px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.15s, box-shadow 0.15s;
+    border: 1px solid var(--border);
+}
+
+li:hover {
+    background: var(--surface-hover);
+    box-shadow: var(--shadow);
+}
+
+li.editing {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+li.removing {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.2s ease-out;
+}
+
+/* Custom Checkbox */
+.custom-checkbox {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.custom-checkbox input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    background: var(--surface);
+}
+
+.custom-checkbox:hover .checkmark {
+    border-color: var(--accent);
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.text {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-primary);
+    word-break: break-word;
+    cursor: pointer;
+}
+
+li.done .text {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+li.done {
+    opacity: 0.6;
+}
+
+.edit-input {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 6px 10px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    outline: none;
+    font-family: inherit;
+    background: var(--surface);
+}
+
+.actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+li:hover .actions {
+    opacity: 1;
+}
+
+.edit-btn,
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.edit-btn:hover {
+    color: var(--accent);
+    background: rgba(13, 148, 136, 0.1);
+}
+
+.delete-btn:hover {
+    color: var(--danger);
+    background: #fef2f2;
+}
+
+/* Loading spinner */
+.spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+footer p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    body {
+        padding: 20px 12px;
+    }
+    
+    .app-container {
+        padding: 24px 20px;
+        border-radius: 12px;
+    }
+    
+    .actions {
+        opacity: 1;
+    }
+}
