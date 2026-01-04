@@ -157,6 +157,27 @@ docker-compose up --build
 
 The Ansible playbook runs after Terraform provisions the infrastructure and populates the database with initial data so the application has content immediately upon startup.
 
+## Testing
+
+### Run Backend Tests
+
+```bash
+# Run tests in Docker
+docker-compose --profile test up backend-test --build
+```
+
+### Test Coverage
+
+The test suite includes:
+- Health check endpoint (1 test)
+- CRUD operations - Create, Read, Update, Delete (8 tests)
+- Error handling and edge cases (3 tests)
+- CORS headers validation (2 tests)
+
+**Total: 14 test cases** covering all API endpoints with DynamoDB mocking (no real AWS connection needed).
+
+Coverage results are displayed directly in the terminal output.
+
 ## LocalStack Limitations
 
 This project uses **LocalStack Community (free)** which supports:

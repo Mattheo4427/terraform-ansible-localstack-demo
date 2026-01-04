@@ -107,6 +107,32 @@ services:
     networks:
       - app-network
 
+  backend-test:
+    build:
+      context: ./backend
+    container_name: backend-test
+    working_dir: /app
+    command: pytest tests/ -v --cov=. --cov-report=term-missing
+    volumes:
+      - ./backend:/app
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - DYNAMODB_ENDPOINT=http://localstack:4566
+      - DYNAMODB_TABLE=todo
+    depends_on:
+      localstack:
+        condition: service_healthy
+      terraform:
+        condition: service_completed_successfully
+      ansible:
+        condition: service_completed_successfully
+    networks:
+      - app-network
+    profiles:
+      - test
+
 networks:
   app-network:
     driver: bridge
