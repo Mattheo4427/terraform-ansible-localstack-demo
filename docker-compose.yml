@@ -32,6 +32,49 @@ services:
       - app-network
     restart: on-failure
 
+  terraform:
+    image: hashicorp/terraform:latest
+    container_name: terraform
+    working_dir: /terraform
+    volumes:
+      - ./terraform:/terraform
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+    depends_on:
+      localstack:
+        condition: service_healthy
+    networks:
+      - app-network
+    entrypoint: ["sh", "-c", "terraform init && terraform apply -auto-approve"]
+
+  ansible:
+    image: cytopia/ansible:latest-tools
+    container_name: ansible
+    working_dir: /ansible
+    volumes:
+      - ./ansible:/ansible
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - ANSIBLE_HOST_KEY_CHECKING=False
+    depends_on:
+      terraform:
+        condition: service_completed_successfully
+      localstack:
+        condition: service_healthy
+    networks:
+      - app-network
+    entrypoint: 
+      - sh
+      - -c
+      - |
+        pip install boto3 botocore awscli && \
+        ansible-galaxy collection install amazon.aws && \
+        ansible-playbook -i inventory.ini playbook.yml
+
   backend:
     build:
       context: ./backend
@@ -44,6 +87,8 @@ services:
       localstack:
         condition: service_healthy
       terraform:
+        condition: service_completed_successfully
+      ansible:
         condition: service_completed_successfully
     networks:
       - app-network
@@ -61,23 +106,6 @@ services:
       - backend
     networks:
       - app-network
-
-  terraform:
-    image: hashicorp/terraform:latest
-    container_name: terraform
-    working_dir: /terraform
-    volumes:
-      - ./terraform:/terraform
-    environment:
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - AWS_DEFAULT_REGION=us-east-1
-    depends_on:
-      localstack:
-        condition: service_healthy
-    networks:
-      - app-network
-    entrypoint: ["sh", "-c", "terraform init && terraform apply -auto-approve"]
 
 networks:
   app-network:

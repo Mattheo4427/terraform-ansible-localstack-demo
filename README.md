@@ -1,11 +1,12 @@
-# Todo App with Terraform & LocalStack
+# Todo App with Terraform, Ansible & LocalStack
 
-A simple Todo application demonstrating **Infrastructure as Code (IaC)** using Terraform with LocalStack to simulate AWS services locally.
+A simple Todo application demonstrating **Infrastructure as Code (IaC)** using Terraform and **Configuration Management** with Ansible, all running on LocalStack to simulate AWS services locally.
 
 ## Purpose
 
 This project showcases how to:
 - Use **Terraform** to provision AWS resources locally
+- Use **Ansible** to seed initial data into the database
 - Simulate **AWS DynamoDB** using **LocalStack** (free tier)
 - Build a full-stack application with **Flask** (Python)
 - Use **Nginx** as a reverse proxy / load balancer
@@ -34,11 +35,15 @@ This project showcases how to:
 │        │                  │ LocalStack │ :4566                  │
 │        │                  │ (DynamoDB) │                        │
 │        │                  └────────────┘                        │
-│        │                       ▲                                │
-│        │                       │                                │
-│        │                  ┌────┴─────┐                          │
-│        │                  │Terraform │ (provisions table)       │
-│        │                  └──────────┘                          │
+│        │                   ▲          ▲                         │
+│        │                   │          │                         │
+│        │           ┌───────┴─┐      ┌─┴───────────┐             │
+│        │           │ Ansible │      │  Terraform  │             │
+│        │           └─────────┘      └─────────────┘             │
+│        │          (seeds data)     (provisions table)           │
+│        │                                                        │
+│        │                                                        │
+│        │                                                        │
 │        │                                                        │
 │        └── /* ──────────▶ ┌──────────┐                          │
 │                           │ Frontend │ Flask :3000              │
@@ -52,6 +57,7 @@ This project showcases how to:
 | Component | Technology | Role |
 |-----------|------------|------|
 | **Infrastructure** | Terraform | Provisions DynamoDB on LocalStack |
+| **Configuration** | Ansible | Seeds initial data into DynamoDB |
 | **Cloud Simulation** | LocalStack | Emulates AWS locally (DynamoDB) |
 | **Load Balancer** | Nginx | Reverse proxy, routes `/api` vs `/` |
 | **Backend** | Flask (Python) | REST API for todos |
@@ -69,6 +75,9 @@ terraform-local-aws-demo/
 │   ├── provider.tf             # AWS/LocalStack configuration
 │   ├── database.tf             # DynamoDB table definition
 │   └── outputs.tf              # Terraform outputs
+├── ansible/
+│   ├── inventory.ini           # Ansible inventory
+│   └── playbook.yml            # Data seeding playbook
 ├── backend/
 │   ├── Dockerfile
 │   ├── main.py                 # Flask REST API
@@ -117,9 +126,10 @@ docker-compose up --build
 
 1. **LocalStack** → Starts and waits for healthcheck
 2. **Terraform** → Creates DynamoDB table `todo`
-3. **Backend** → Starts after Terraform completes
-4. **Frontend** → Starts after Backend
-5. **Nginx** → Starts after Backend + Frontend
+3. **Ansible** → Seeds the table with 3 initial todo items
+4. **Backend** → Starts after Terraform and Ansible complete
+5. **Frontend** → Starts after Backend
+6. **Nginx** → Starts after Backend + Frontend
 
 ## API Endpoints
 
@@ -131,11 +141,21 @@ docker-compose up --build
 | `PUT` | `/api/todos/<id>` | Update a todo |
 | `DELETE` | `/api/todos/<id>` | Delete a todo |
 
-## Terraform Resources
+## Infrastructure Components
+
+### Terraform Resources
 
 | Resource | Description |
 |----------|-------------|
 | `aws_dynamodb_table.todo_table` | DynamoDB table with `id` as partition key |
+
+### Ansible Tasks
+
+| Task | Description |
+|------|-------------|
+| Seed DynamoDB | Inserts 3 sample todo items into the `todo` table |
+
+The Ansible playbook runs after Terraform provisions the infrastructure and populates the database with initial data so the application has content immediately upon startup.
 
 ## LocalStack Limitations
 
